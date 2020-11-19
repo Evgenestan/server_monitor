@@ -1,0 +1,30 @@
+name: server_monitor
+description: Server monitoring application
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  pedantic: ^1.9.0
+  flutter_launcher_icons: ^0.8.0
+
+  cupertino_icons: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/icons/server_icon.png
+  uses-material-design: true
+
+flutter_icons:
+    android: true
+    image_path: server_icon.png
