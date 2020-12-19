@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "237667039848",
+    "firebase_url": "https://server-monitor-d99ce.firebaseio.com",
+    "project_id": "server-monitor-d99ce",
+    "storage_bucket": "server-monitor-d99ce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237667039848:android:1f5bc544e516005eb859dd",
+        "android_client_info": {
+          "package_name": "com.evgenestan.server_monitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "237667039848-aa41p85seddj55hpuahsuimn2hnt8f21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB40Mmla9otsLMtVODJY4v6mT31JjDrIRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "237667039848-aa41p85seddj55hpuahsuimn2hnt8f21.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

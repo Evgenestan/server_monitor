@@ -3,7 +3,7 @@ description: Server monitoring application
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.0.2+5
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -13,12 +13,19 @@ dependencies:
     sdk: flutter
   pedantic: ^1.9.0
   flutter_launcher_icons: ^0.8.0
+  uni_links: ^0.4.0
+  dio: ^3.0.10
+  mobx: ^1.2.1+4
+  flutter_mobx: ^1.1.0+2
+  charts_flutter: ^0.9.0
 
   cupertino_icons: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mobx_codegen: ^1.1.0+12
+  build_runner: ^1.10.2
 
 flutter:
   assets:
