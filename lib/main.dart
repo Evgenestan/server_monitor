@@ -1,34 +1,43 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:server_monitor/globalVariable.dart';
+import 'package:provider/provider.dart';
 import 'package:server_monitor/main/main_view.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
 
-Timer _timer;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  _timer = Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());
   runApp(MyApp());
 }
 
-Future<void> _runUpdate() async {
-  final ServerState _serverState = serverState;
-  print('Update');
-  await _serverState.getData();
-}
-
 class MyApp extends StatelessWidget {
+  final ServerState _serverState = ServerState();
+
+  Future<void> _runUpdate() async {
+    await _serverState.getData();
+    print('Updated');
+  }
+
+  void _initUpdate() {
+    final Timer _timer = Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Server Monitor',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    _initUpdate();
+    return MultiProvider(
+      providers: [
+        Provider<ServerState>(create: (_) => _serverState),
+      ],
+      child: MaterialApp(
+        title: 'Server Monitor',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: MainView(),
       ),
-      home: MainView(),
     );
   }
 }

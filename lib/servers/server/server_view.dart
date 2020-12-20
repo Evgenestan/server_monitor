@@ -2,9 +2,10 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:server_monitor/globalVariable.dart';
+import 'package:provider/provider.dart';
 import 'package:server_monitor/servers/model/server.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ServerView extends StatefulWidget {
   const ServerView({Key key, this.serverName}) : super(key: key);
@@ -16,7 +17,6 @@ class ServerView extends StatefulWidget {
 
 class _ServerViewState extends State<ServerView> {
   ServerState _serverState;
-  Server _server;
 
   Widget _item({String title, String value}) {
     return Card(
@@ -62,6 +62,14 @@ class _ServerViewState extends State<ServerView> {
       ];
     }
 
+    List<Test> _createData() {
+      final List<Test> data = [];
+      for (int i = 0; i < values.length; i++) {
+        data.add(Test(values[i], i));
+      }
+      return data;
+    }
+
     return Card(
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 20,
@@ -69,7 +77,26 @@ class _ServerViewState extends State<ServerView> {
         child: Stack(
           children: [
             Center(
-              child: charts.LineChart(_createSampleData()),
+              //child: charts.LineChart(_createSampleData()),
+              child: SfCartesianChart(
+                //primaryXAxis: CategoryAxis(),
+                //title: ChartTitle(text: 'Half yearly sales analysis'),
+                // Enable legend
+                primaryXAxis: NumericAxis(interval: 1, majorGridLines: MajorGridLines(width: 0)),
+                primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
+                legend: Legend(isVisible: false),
+                // Enable tooltip
+                tooltipBehavior: TooltipBehavior(enable: true),
+                series: <SplineAreaSeries<Test, int>>[
+                  SplineAreaSeries<Test, int>(
+                    dataSource: _createData(),
+                    xValueMapper: (Test test, _) => test.position,
+                    yValueMapper: (Test test, _) => test.value,
+                    // Enable data label
+                    //dataLabelSettings: DataLabelSettings(isVisible: false),
+                  )
+                ],
+              ),
             ),
             Positioned(
               child: Text(
@@ -102,10 +129,9 @@ class _ServerViewState extends State<ServerView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _serverState = serverState;
-    _server = _serverState.servers[widget.serverName];
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _serverState = Provider.of<ServerState>(context);
   }
 
   @override

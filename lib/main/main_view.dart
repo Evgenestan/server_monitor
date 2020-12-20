@@ -1,12 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:server_monitor/globalVariable.dart';
+import 'package:provider/provider.dart';
 import 'package:server_monitor/main/server_card.dart';
 import 'package:server_monitor/servers/model/server.dart';
 import 'package:server_monitor/servers/server/server_view.dart';
+import 'package:server_monitor/servers/server_edit_view.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
 
 class MainView extends StatefulWidget {
@@ -18,28 +17,13 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   ServerState _serverState;
-  bool _canUpdate = false;
-  Timer _timer;
 
   void _addServer() {
-    _canUpdate = !_canUpdate;
-    _runUpdate();
-    //_serverState.getData();
-    //Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerEditView()));
-  }
-
-  Future<void> _runUpdate() async {
-    print('Update');
-    await _serverState.getData();
+    Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerEditView()));
   }
 
   void _openServer(Server server) {
-    Navigator.push<dynamic>(
-        context,
-        MaterialPageRoute<dynamic>(
-            builder: (context) => ServerView(
-                  serverName: server.name,
-                )));
+    Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
   }
 
   Widget _buildServerCard(BuildContext context, int index) {
@@ -54,10 +38,9 @@ class _MainViewState extends State<MainView> {
   }
 
   @override
-  void initState() {
-    _serverState = serverState;
-    //_timer = Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _serverState = Provider.of<ServerState>(context);
   }
 
   @override
