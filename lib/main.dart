@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:server_monitor/main/main_view.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +19,10 @@ class MyApp extends StatelessWidget {
     print('Updated');
   }
 
-  void _initUpdate() {
-    final Timer _timer = Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());
+  Future<void> _initUpdate() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    _serverState.endpoint = sharedPreferences.getString('address');
+    Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());
   }
 
   @override

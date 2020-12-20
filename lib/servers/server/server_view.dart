@@ -1,4 +1,3 @@
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -46,26 +45,10 @@ class _ServerViewState extends State<ServerView> {
   }
 
   Widget _bigItem({String title, List<double> values}) {
-    List<charts.Series<Test, double>> _createSampleData() {
-      final List<Test> data = [];
+    List<CpuLoad> _createData() {
+      final List<CpuLoad> data = [];
       for (int i = 0; i < values.length; i++) {
-        data.add(Test(values[i], i));
-      }
-      return [
-        charts.Series<Test, double>(
-          id: 'Sales',
-          colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-          domainFn: (Test sales, _) => sales.position.toDouble(),
-          measureFn: (Test sales, _) => sales.value,
-          data: data,
-        )
-      ];
-    }
-
-    List<Test> _createData() {
-      final List<Test> data = [];
-      for (int i = 0; i < values.length; i++) {
-        data.add(Test(values[i], i));
+        data.add(CpuLoad(values[i], i));
       }
       return data;
     }
@@ -74,39 +57,21 @@ class _ServerViewState extends State<ServerView> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 20,
         height: MediaQuery.of(context).size.width / 2 - 20,
-        child: Stack(
-          children: [
-            Center(
-              //child: charts.LineChart(_createSampleData()),
-              child: SfCartesianChart(
-                //primaryXAxis: CategoryAxis(),
-                //title: ChartTitle(text: 'Half yearly sales analysis'),
-                // Enable legend
-                primaryXAxis: NumericAxis(interval: 1, majorGridLines: MajorGridLines(width: 0)),
-                primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
-                legend: Legend(isVisible: false),
-                // Enable tooltip
-                tooltipBehavior: TooltipBehavior(enable: true),
-                series: <SplineAreaSeries<Test, int>>[
-                  SplineAreaSeries<Test, int>(
-                    dataSource: _createData(),
-                    xValueMapper: (Test test, _) => test.position,
-                    yValueMapper: (Test test, _) => test.value,
-                    // Enable data label
-                    //dataLabelSettings: DataLabelSettings(isVisible: false),
-                  )
-                ],
-              ),
-            ),
-            Positioned(
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-              ),
-              left: 0,
-              right: 0,
-            ),
-          ],
+        child: Center(
+          child: SfCartesianChart(
+            title: ChartTitle(text: title),
+            primaryXAxis: NumericAxis(interval: 1, majorGridLines: MajorGridLines(width: 0)),
+            primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
+            legend: Legend(isVisible: false),
+            tooltipBehavior: TooltipBehavior(enable: true),
+            series: <SplineAreaSeries<CpuLoad, int>>[
+              SplineAreaSeries<CpuLoad, int>(
+                dataSource: _createData(),
+                xValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.position,
+                yValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.value,
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -147,8 +112,8 @@ class _ServerViewState extends State<ServerView> {
   }
 }
 
-class Test {
-  Test(this.value, this.position);
+class CpuLoad {
+  CpuLoad(this.value, this.position);
   final double value;
   final int position;
 }

@@ -30,7 +30,7 @@ class _MainViewState extends State<MainView> {
     final String key = _serverState.servers.keys.toList()[index];
     final Server server = _serverState.servers[key];
     return ServerCard(
-      title: server.name,
+      title: server?.name ?? 'Имя сервера не найдено',
       isOnline: DateTime.now().toUtc().difference(server.createTimes.last) < const Duration(seconds: 10),
       ipAddress: 'initialLink uni_links',
       onPressed: () => _openServer(server),
