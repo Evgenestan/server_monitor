@@ -9,7 +9,7 @@ class ServerState = _ServerStateBase with _$ServerState;
 abstract class _ServerStateBase with Store {
   final ServerClient _serverClient = ServerClient();
 
-  String endpoint = '';
+  List<String> endpoints = [];
 
   @observable
   int count = 0;
@@ -19,9 +19,10 @@ abstract class _ServerStateBase with Store {
 
   @action
   Future<void> getData() async {
-    final Server _server = await _serverClient.getData(endpoint);
-    if (_server != null) {
-      servers[_server.name] = _server;
+    final Map<String, Server> _servers = await _serverClient.getData(endpoints);
+    if (_servers != null) {
+      servers.clear();
+      servers.addAll(_servers);
       count = servers.length;
     }
   }

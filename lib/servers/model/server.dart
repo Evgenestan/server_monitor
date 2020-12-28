@@ -16,4 +16,6 @@ class Server {
   int motherFan;
   int cpuLoad;
   int gpuLoad;
+
+  String host = '';
 }

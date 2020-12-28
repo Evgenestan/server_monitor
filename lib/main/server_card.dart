@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ServerCard extends StatelessWidget {
-  const ServerCard({Key key, @required this.title, @required this.isOnline, @required this.ipAddress, this.onPressed}) : super(key: key);
+  const ServerCard({Key key, @required this.title, @required this.isOnline, @required this.host, this.onPressed}) : super(key: key);
   final String title;
-  final String ipAddress;
+  final String host;
   final bool isOnline;
   final VoidCallback onPressed;
 
@@ -13,11 +13,19 @@ class ServerCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(parameter + ':'),
-        Row(
-          children: [
-            if (icon != null) icon,
-            Text(text),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              if (icon != null) icon,
+              Expanded(
+                  child: Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.right,
+              )),
+            ],
+          ),
         ),
       ],
     );
@@ -37,6 +45,7 @@ class ServerCard extends StatelessWidget {
               Image.network('https://sun9-51.userapi.com/pMpaVr5o5RzH0WUVsUzT50P2ofKvxTqw32hXmg/r_GEx4qM1_M.jpg'),
               Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildTextWithParameter(text: title, parameter: 'Название'),
                     _buildTextWithParameter(
@@ -47,7 +56,7 @@ class ServerCard extends StatelessWidget {
                         color: isOnline ? Colors.green : Colors.red,
                       ),
                     ),
-                    _buildTextWithParameter(text: ipAddress, parameter: 'Ip адрес'),
+                    _buildTextWithParameter(text: host, parameter: 'Адрес сервера'),
                   ],
                 ),
               )

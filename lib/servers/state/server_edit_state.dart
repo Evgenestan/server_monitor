@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
+import 'package:server_monitor/servers/client/server_client.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,10 +20,10 @@ abstract class _ServerEditState with Store {
   String addressErrorText;
 
   @observable
-  String nameErrorText;
+  String passwordErrorText;
 
-  String _address = '';
-  String _name = '';
+  String _host = '';
+  String _password = '';
 
   String _validation(String value) {
     if (value.contains(' ')) {
@@ -35,9 +36,9 @@ abstract class _ServerEditState with Store {
   void addressInput(String value) {
     if (value?.isNotEmpty ?? false) {
       addressErrorText = _validation(value);
-      _address = value ?? '';
-      if (_address == 'fff') {
-        _address = 'https://projecttest0.000webhostapp.com/api/get';
+      _host = value ?? '';
+      if (_host == 'fff') {
+        _host = 'https://projecttest0.000webhostapp.com/api/get';
       }
     }
   }
@@ -45,36 +46,45 @@ abstract class _ServerEditState with Store {
   @action
   void nameInput(String value) {
     if (value?.isNotEmpty ?? false) {
-      nameErrorText = _validation(value);
-      _name = value ?? '';
+      passwordErrorText = _validation(value);
+      _password = value ?? '';
     }
   }
 
   @action
   bool _finalValidation() {
     bool error = true;
-    if (nameErrorText != null || addressErrorText != null) {
+    if (passwordErrorText != null || addressErrorText != null) {
       error = false;
     }
-    if (_name.isEmpty) {
-      nameErrorText = 'Пароль - обязательное поле';
+    if (_password.isEmpty) {
+      passwordErrorText = 'Пароль - обязательное поле';
       error = false;
     }
-    if (_address.isEmpty) {
+    if (_host.isEmpty) {
       addressErrorText = 'Адрес сервера - обязательное поле';
+      error = false;
+    }
+    if (serverState.endpoints.contains(_host)) {
+      addressErrorText = 'Такой адрес уже существует';
+      error = false;
+    }
+    if (!_host.contains('http')) {
+      addressErrorText = 'Некоректный адрес';
       error = false;
     }
     return error;
   }
 
   @action
-  Future<bool> addServer() async {
+  Future<bool> addHost() async {
     if (_finalValidation()) {
       //ToDo: проверка на бэке
-      final bool result = true; //ToDo: проверка на бэке
+      final bool result = await ServerClient.checkHost(_host, _password);
       if (result) {
-        serverState.endpoint = _address;
-        await _sharedPreferences.setString('address', _address);
+        serverState.endpoints.add(_host);
+        await _sharedPreferences.setStringList('hosts', serverState.endpoints);
+        return true;
       }
       return false;
     }

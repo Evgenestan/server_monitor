@@ -17,6 +17,12 @@ class _ServerEditViewState extends State<ServerEditView> {
   ServerEditState _serverEditState;
   ServerState _serverState;
 
+  Future<void> _addHost() async {
+    if (await _serverEditState.addHost() == true) {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,8 +60,9 @@ class _ServerEditViewState extends State<ServerEditView> {
               const SizedBox(height: 15),
               TextField(
                 controller: _nameController,
+                obscureText: true,
                 decoration: InputDecoration(
-                  errorText: _serverEditState.nameErrorText,
+                  errorText: _serverEditState.passwordErrorText,
                   labelText: 'Пароль',
                   border: const OutlineInputBorder(),
                 ),
@@ -63,7 +70,7 @@ class _ServerEditViewState extends State<ServerEditView> {
               const SizedBox(height: 15),
               MyButton(
                 title: 'Добавить сервер',
-                onPressed: _serverEditState.addServer,
+                onPressed: _addHost,
               ),
             ],
           ),
