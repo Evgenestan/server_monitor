@@ -94,9 +94,9 @@ class _ServerViewState extends State<ServerView> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _serverState = Provider.of<ServerState>(context);
+  void initState() {
+    super.initState();
+    _serverState = Provider.of<ServerState>(context, listen: false);
   }
 
   @override

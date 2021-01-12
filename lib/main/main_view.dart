@@ -7,6 +7,7 @@ import 'package:server_monitor/servers/model/server.dart';
 import 'package:server_monitor/servers/server/server_view.dart';
 import 'package:server_monitor/servers/server_edit_view.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
+import 'package:server_monitor/widgets/modals.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -26,27 +27,80 @@ class _MainViewState extends State<MainView> {
     Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
   }
 
-  void _editServer(DismissDirection direction) {
-    //if()
+  void deleteServer(Server server) {
+    final host = server.host;
+    _serverState.deleteHost(host);
   }
 
-  Future<bool> test(DismissDirection direction) async {
+  Future<bool> remove(Server server) async {
+    final res = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        title: 'Вы уверены что хотите удалить хост?',
+        description: 'Все связанные с ним сервера будут удалены',
+        actions: [
+          FlatButton(
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.black),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+            onPressed: () {
+              deleteServer(server);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
     return false;
+  }
+
+  Widget slideLeftBackground() {
+    return Container(
+      color: Colors.red,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: const <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+            Text(
+              'Delete',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerRight,
+      ),
+    );
   }
 
   Widget _buildServerCard(BuildContext context, int index) {
     final String key = _serverState.servers.keys.toList()[index];
     final Server server = _serverState.servers[key];
     return Dismissible(
-      confirmDismiss: test,
-      background: Container(
-        alignment: Alignment.centerLeft,
-        color: Colors.red,
-        child: const Text('Удалить хост'),
-      ),
-      secondaryBackground: Container(color: Colors.lightBlueAccent),
+      confirmDismiss: (_) => remove(server),
+      background: slideLeftBackground(),
+      direction: DismissDirection.endToStart,
       key: Key('dismissible $index'),
-      onDismissed: _editServer,
       child: ServerCard(
         title: server?.name ?? 'Имя сервера не найдено',
         isOnline: DateTime.now().toUtc().difference(server.createTimes.last) < const Duration(seconds: 10),
@@ -57,16 +111,34 @@ class _MainViewState extends State<MainView> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _serverState = Provider.of<ServerState>(context);
+  void initState() {
+    super.initState();
+    _serverState = Provider.of<ServerState>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text(
+          'Server Monitor',
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
+        child: Stack(
+          children: [
+            Center(
+              child: Observer(
+                builder: (_) => _serverState.count > 0
+                    ? const CircularProgressIndicator(
+                        backgroundColor: Colors.white,
+                      )
+                    : Container(),
+              ),
+            ),
+            const Center(child: Icon(Icons.add)),
+          ],
+        ),
         onPressed: _addServer,
       ),
       body: Observer(

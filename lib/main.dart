@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future<void> _initUpdate() async {
+    await _serverState.init();
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     _serverState.endpoints = sharedPreferences.getStringList('hosts') ?? [];
     Timer.periodic(const Duration(seconds: 3), (timer) => _runUpdate());

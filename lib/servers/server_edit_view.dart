@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:server_monitor/servers/state/server_edit_state.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
 import 'package:server_monitor/widgets/buttons.dart';
+import 'package:server_monitor/widgets/modals.dart';
 
 class ServerEditView extends StatefulWidget {
   @override
@@ -18,24 +19,30 @@ class _ServerEditViewState extends State<ServerEditView> {
   ServerState _serverState;
 
   Future<void> _addHost() async {
-    if (await _serverEditState.addHost() == true) {
+    final result = await _serverEditState.addHost();
+    if (result == true) {
       Navigator.of(context).pop();
+    } else if (result == false) {
+      await showDialog<void>(
+        context: context,
+        builder: (_) => CustomDialog(
+          title: 'Ошибка',
+          description: 'Неправильный адрес хоста или пароль',
+          actions: [
+            FlatButton(onPressed: () => Navigator.pop(context), child: const Text('Понятно')),
+          ],
+        ),
+      );
     }
   }
 
   @override
   void initState() {
     super.initState();
+    _serverState = Provider.of<ServerState>(context, listen: false);
+    _serverEditState = ServerEditState(serverState: _serverState);
     _addressController.addListener(() => _serverEditState.addressInput(_addressController.text));
     _nameController.addListener(() => _serverEditState.nameInput(_nameController.text));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _serverState = Provider.of<ServerState>(context);
-    _serverEditState = ServerEditState(serverState: _serverState);
-    _serverEditState.init();
   }
 
   @override
@@ -45,33 +52,43 @@ class _ServerEditViewState extends State<ServerEditView> {
       body: GestureDetector(
         onTap: FocusScope.of(context).unfocus,
         child: Observer(
-          builder: (_) => ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            physics: const BouncingScrollPhysics(),
+          builder: (_) => Stack(
             children: [
-              TextField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  errorText: _serverEditState.addressErrorText,
-                  labelText: 'Адрес сервера',
-                  border: const OutlineInputBorder(),
-                ),
+              ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  TextField(
+                    controller: _addressController,
+                    decoration: InputDecoration(
+                      errorText: _serverEditState.addressErrorText,
+                      labelText: 'Адрес хоста',
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: _nameController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      errorText: _serverEditState.passwordErrorText,
+                      labelText: 'Пароль',
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  MyButton(
+                    title: 'Добавить хост',
+                    onPressed: _addHost,
+                  ),
+                ],
               ),
-              const SizedBox(height: 15),
-              TextField(
-                controller: _nameController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  errorText: _serverEditState.passwordErrorText,
-                  labelText: 'Пароль',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 15),
-              MyButton(
-                title: 'Добавить сервер',
-                onPressed: _addHost,
-              ),
+              if (_serverEditState.isLoading)
+                Container(
+                  alignment: Alignment.center,
+                  color: Colors.white.withOpacity(0.5),
+                  child: const CircularProgressIndicator(),
+                )
             ],
           ),
         ),

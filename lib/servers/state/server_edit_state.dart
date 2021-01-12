@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
 import 'package:server_monitor/servers/client/server_client.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'server_edit_state.g.dart';
 
@@ -14,13 +13,14 @@ abstract class _ServerEditState with Store {
   @protected
   final ServerState serverState;
 
-  SharedPreferences _sharedPreferences;
-
   @observable
   String addressErrorText;
 
   @observable
   String passwordErrorText;
+
+  @observable
+  bool isLoading = false;
 
   String _host = '';
   String _password = '';
@@ -41,6 +41,11 @@ abstract class _ServerEditState with Store {
         _host = 'https://projecttest0.000webhostapp.com/api/get';
       }
     }
+  }
+
+  @action
+  void setIsLoading(bool value) {
+    isLoading = value;
   }
 
   @action
@@ -79,19 +84,19 @@ abstract class _ServerEditState with Store {
   @action
   Future<bool> addHost() async {
     if (_finalValidation()) {
-      //ToDo: проверка на бэке
-      final bool result = await ServerClient.checkHost(_host, _password);
-      if (result) {
-        serverState.endpoints.add(_host);
-        await _sharedPreferences.setStringList('hosts', serverState.endpoints);
+      isLoading = true;
+      final String key = await ServerClient.checkHost(_host, _password);
+      if (key != null) {
+        serverState.addHost(_host, key);
+        isLoading = false;
         return true;
       }
+      isLoading = false;
       return false;
     }
     return null;
   }
 
-  Future<void> init() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
-  }
+  @action
+  void init() {}
 }
