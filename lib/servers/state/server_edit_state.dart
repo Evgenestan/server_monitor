@@ -37,9 +37,9 @@ abstract class _ServerEditState with Store {
     if (value?.isNotEmpty ?? false) {
       addressErrorText = _validation(value);
       _host = value ?? '';
-      if (_host == 'fff') {
-        _host = 'https://projecttest0.000webhostapp.com/api/get';
-      }
+      // if (_host == 'fff') {
+      //   _host = 'https://projecttest0.000webhostapp.com/api/get';
+      // }
     }
   }
 
