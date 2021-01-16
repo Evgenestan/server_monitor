@@ -33,7 +33,7 @@ class _MainViewState extends State<MainView> {
   }
 
   Future<bool> remove(Server server) async {
-    final res = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => CustomDialog(
         title: 'Вы уверены что хотите удалить хост?',
@@ -41,7 +41,7 @@ class _MainViewState extends State<MainView> {
         actions: [
           FlatButton(
             child: const Text(
-              'Cancel',
+              'Отмена',
               style: TextStyle(color: Colors.black),
             ),
             onPressed: () {
@@ -50,7 +50,7 @@ class _MainViewState extends State<MainView> {
           ),
           FlatButton(
             child: const Text(
-              'Delete',
+              'Удалить',
               style: TextStyle(color: Colors.red),
             ),
             onPressed: () {
@@ -76,7 +76,7 @@ class _MainViewState extends State<MainView> {
               color: Colors.white,
             ),
             Text(
-              'Delete',
+              'Удалить',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,

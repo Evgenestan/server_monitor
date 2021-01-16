@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:server_monitor/servers/model/server.dart';
+import 'package:server_monitor/servers/server/schedule_view.dart';
 import 'package:server_monitor/servers/state/server_state.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -17,38 +18,48 @@ class ServerView extends StatefulWidget {
 class _ServerViewState extends State<ServerView> {
   ServerState _serverState;
 
-  Widget _item({String title, String value}) {
+  Widget _item({String title, String value, ScheduleType scheduleType}) {
+    void _openScheduleOfValues() {
+      if (scheduleType != null) {
+        Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ScheduleView(serverName: widget.serverName, scheduleType: scheduleType)));
+      }
+    }
+
     return Card(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width / 2 - 20,
-        height: MediaQuery.of(context).size.width / 2 - 20,
-        child: Stack(
-          children: [
-            Positioned(
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
+      child: InkWell(
+        onTap: _openScheduleOfValues,
+        child: Container(
+          width: MediaQuery.of(context).size.width / 2 - 20,
+          height: MediaQuery.of(context).size.width / 2 - 20,
+          padding: const EdgeInsets.all(5),
+          child: Stack(
+            children: [
+              Positioned(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                ),
+                left: 0,
+                right: 0,
               ),
-              left: 0,
-              right: 0,
-            ),
-            Center(
-              child: Text(
-                value,
-                textScaleFactor: 3,
+              Center(
+                child: Text(
+                  value,
+                  textScaleFactor: 3,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _bigItem({String title, List<double> values}) {
-    List<CpuLoad> _createData() {
-      final List<CpuLoad> data = [];
+    List<Value> _createData() {
+      final List<Value> data = [];
       for (int i = 0; i < values.length; i++) {
-        data.add(CpuLoad(values[i], i));
+        data.add(Value(values[i], i));
       }
       return data;
     }
@@ -64,11 +75,11 @@ class _ServerViewState extends State<ServerView> {
             primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
             legend: Legend(isVisible: false),
             tooltipBehavior: TooltipBehavior(enable: true),
-            series: <SplineAreaSeries<CpuLoad, int>>[
-              SplineAreaSeries<CpuLoad, int>(
+            series: <SplineAreaSeries<Value, int>>[
+              SplineAreaSeries<Value, int>(
                 dataSource: _createData(),
-                xValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.position,
-                yValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.value,
+                xValueMapper: (Value cpuLoad, _) => cpuLoad.position,
+                yValueMapper: (Value cpuLoad, _) => cpuLoad.value,
               )
             ],
           ),
@@ -79,16 +90,24 @@ class _ServerViewState extends State<ServerView> {
 
   Widget _buildBody(Server server) {
     return ListView(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _item(title: 'Температура процессора', value: server.cpuTemp.toString()),
-            _item(title: 'Скорость куллера процессора', value: server.cpuFan.toString()),
+            _item(title: 'Температура CPU', value: server.cpuTemp.toString(), scheduleType: ScheduleType.cpuTemps),
+            _item(title: 'Скорость вращения вентилятора системы охлаждения CPU', value: server.cpuFan.toString()),
           ],
         ),
-        _bigItem(title: 'Загруженность процессора', values: server.cpuLoads),
+        _bigItem(title: 'Загруженность CPU', values: server.cpuLoads),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _item(title: 'Температура GPU', value: server.gpuTemp.toString(), scheduleType: ScheduleType.gpuTemps),
+            _item(title: 'Скорость вращения вентилятора системы охлаждения GPU', value: server.gpuFan.toString()),
+          ],
+        ),
+        _bigItem(title: 'Загруженность GPU', values: server.gpuLoads),
       ],
     );
   }
@@ -112,8 +131,8 @@ class _ServerViewState extends State<ServerView> {
   }
 }
 
-class CpuLoad {
-  CpuLoad(this.value, this.position);
+class Value {
+  Value(this.value, this.position);
   final double value;
   final int position;
 }
