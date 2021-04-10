@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:server_monitor/constants.dart';
 
 class MyButton extends StatelessWidget {
-  const MyButton({Key key, this.onPressed, this.title}) : super(key: key);
-  final VoidCallback onPressed;
+  const MyButton({Key? key, this.onPressed, this.title = ''}) : super(key: key);
+  final VoidCallback? onPressed;
   final String title;
   @override
   Widget build(BuildContext context) {

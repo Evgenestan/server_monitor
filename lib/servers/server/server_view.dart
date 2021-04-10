@@ -8,7 +8,7 @@ import 'package:server_monitor/servers/state/server_state.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ServerView extends StatefulWidget {
-  const ServerView({Key key, this.serverName}) : super(key: key);
+  const ServerView({Key? key, required this.serverName}) : super(key: key);
   final String serverName;
 
   @override
@@ -16,12 +16,15 @@ class ServerView extends StatefulWidget {
 }
 
 class _ServerViewState extends State<ServerView> {
-  ServerState _serverState;
+  late final ServerState _serverState;
 
-  Widget _item({String title, String value, ScheduleType scheduleType}) {
+  Widget _item({required String title, required String value, ScheduleType? scheduleType}) {
     void _openScheduleOfValues() {
       if (scheduleType != null) {
-        Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ScheduleView(serverName: widget.serverName, scheduleType: scheduleType)));
+        Navigator.push<dynamic>(
+            context,
+            MaterialPageRoute<dynamic>(
+                builder: (context) => ScheduleView(serverName: widget.serverName, scheduleType: scheduleType)));
       }
     }
 
@@ -35,12 +38,12 @@ class _ServerViewState extends State<ServerView> {
           child: Stack(
             children: [
               Positioned(
+                left: 0,
+                right: 0,
                 child: Text(
                   title,
                   textAlign: TextAlign.center,
                 ),
-                left: 0,
-                right: 0,
               ),
               Center(
                 child: Text(
@@ -55,7 +58,7 @@ class _ServerViewState extends State<ServerView> {
     );
   }
 
-  Widget _bigItem({String title, List<double> values}) {
+  Widget _bigItem({required String title, required List<double> values}) {
     List<Value> _createData() {
       final List<Value> data = [];
       for (int i = 0; i < values.length; i++) {
@@ -71,8 +74,12 @@ class _ServerViewState extends State<ServerView> {
         child: Center(
           child: SfCartesianChart(
             title: ChartTitle(text: title),
-            primaryXAxis: NumericAxis(interval: 1, majorGridLines: MajorGridLines(width: 0)),
-            primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
+            primaryXAxis: NumericAxis(interval: 1, majorGridLines: const MajorGridLines(width: 0)),
+            primaryYAxis: NumericAxis(
+                majorTickLines: const MajorTickLines(color: Colors.transparent),
+                axisLine: const AxisLine(width: 0),
+                minimum: 0,
+                maximum: 100),
             legend: Legend(isVisible: false),
             tooltipBehavior: TooltipBehavior(enable: true),
             series: <SplineAreaSeries<Value, int>>[
@@ -124,7 +131,7 @@ class _ServerViewState extends State<ServerView> {
       appBar: AppBar(),
       body: Observer(
         builder: (_) => _buildBody(
-          _serverState.servers[widget.serverName],
+          _serverState.servers[widget.serverName]!,
         ),
       ),
     );

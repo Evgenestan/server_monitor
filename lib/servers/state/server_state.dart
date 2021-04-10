@@ -18,7 +18,7 @@ abstract class _ServerStateBase with Store {
   @observable
   ObservableMap<String, Server> servers = ObservableMap();
 
-  SharedPreferences _sharedPreferences;
+  late final SharedPreferences _sharedPreferences;
 
   @action
   void addHost(String host, String key) {
@@ -37,7 +37,7 @@ abstract class _ServerStateBase with Store {
 
   @action
   Future<void> getData() async {
-    final Map<String, Server> _servers = await _serverClient.getData(endpoints) ?? {};
+    final Map<String, Server> _servers = await _serverClient.getData(endpoints);
     servers.clear();
     servers.addAll(_servers);
     count = servers.length;

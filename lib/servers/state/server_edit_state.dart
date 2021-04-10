@@ -8,16 +8,16 @@ part 'server_edit_state.g.dart';
 class ServerEditState = _ServerEditState with _$ServerEditState;
 
 abstract class _ServerEditState with Store {
-  _ServerEditState({@required this.serverState});
+  _ServerEditState({required this.serverState});
 
   @protected
   final ServerState serverState;
 
   @observable
-  String addressErrorText;
+  String addressErrorText = '';
 
   @observable
-  String passwordErrorText;
+  String passwordErrorText = '';
 
   @observable
   bool isLoading = false;
@@ -29,14 +29,14 @@ abstract class _ServerEditState with Store {
     if (value.contains(' ')) {
       return 'Поле не может содержать пробел';
     }
-    return null;
+    return '';
   }
 
   @action
   void addressInput(String value) {
-    if (value?.isNotEmpty ?? false) {
+    if (value.isNotEmpty) {
       addressErrorText = _validation(value);
-      _host = value ?? '';
+      _host = value;
       // if (_host == 'fff') {
       //   _host = 'https://projecttest0.000webhostapp.com/api/get';
       // }
@@ -50,18 +50,15 @@ abstract class _ServerEditState with Store {
 
   @action
   void nameInput(String value) {
-    if (value?.isNotEmpty ?? false) {
+    if (value.isNotEmpty) {
       passwordErrorText = _validation(value);
-      _password = value ?? '';
+      _password = value;
     }
   }
 
   @action
   bool _finalValidation() {
     bool error = true;
-    if (passwordErrorText != null || addressErrorText != null) {
-      error = false;
-    }
     if (_password.isEmpty) {
       passwordErrorText = 'Пароль - обязательное поле';
       error = false;
@@ -86,15 +83,14 @@ abstract class _ServerEditState with Store {
     if (_finalValidation()) {
       isLoading = true;
       final String key = await ServerClient.checkHost(_host, _password);
-      if (key != null) {
+      if (key.isNotEmpty) {
         serverState.addHost(_host, key);
         isLoading = false;
         return true;
       }
       isLoading = false;
-      return false;
     }
-    return null;
+    return false;
   }
 
   @action

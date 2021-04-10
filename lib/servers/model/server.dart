@@ -1,5 +1,5 @@
 class Server {
-  String name;
+  String name = '';
   List<double> cpuTemps = [];
   List<double> cpuFans = [];
   List<double> gpuTemps = [];
@@ -9,13 +9,13 @@ class Server {
   List<double> gpuLoads = [];
   List<DateTime> createTimes = [];
 
-  int cpuTemp;
-  int gpuTemp;
-  int cpuFan;
-  int gpuFan;
-  int motherFan;
-  int cpuLoad;
-  int gpuLoad;
+  int cpuTemp = 0;
+  int gpuTemp = 0;
+  int cpuFan = 0;
+  int gpuFan = 0;
+  int motherFan = 0;
+  int cpuLoad = 0;
+  int gpuLoad = 0;
 
   String host = '';
 }

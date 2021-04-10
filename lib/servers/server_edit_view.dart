@@ -15,14 +15,14 @@ class ServerEditView extends StatefulWidget {
 class _ServerEditViewState extends State<ServerEditView> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  ServerEditState _serverEditState;
-  ServerState _serverState;
+  late final ServerEditState _serverEditState;
+  late final ServerState _serverState;
 
   Future<void> _addHost() async {
     final result = await _serverEditState.addHost();
-    if (result == true) {
+    if (result) {
       Navigator.of(context).pop();
-    } else if (result == false) {
+    } else {
       await showDialog<void>(
         context: context,
         builder: (_) => CustomDialog(

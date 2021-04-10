@@ -9,7 +9,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 enum ScheduleType { cpuTemps, gpuTemps }
 
 class ScheduleView extends StatefulWidget {
-  const ScheduleView({Key key, @required this.scheduleType, @required this.serverName}) : super(key: key);
+  const ScheduleView({Key? key, required this.scheduleType, required this.serverName}) : super(key: key);
   final ScheduleType scheduleType;
   final String serverName;
 
@@ -18,9 +18,9 @@ class ScheduleView extends StatefulWidget {
 }
 
 class _ScheduleViewState extends State<ScheduleView> {
-  ServerState _serverState;
+  late final ServerState _serverState;
 
-  Widget _bigItem({String title, List<double> values}) {
+  Widget _bigItem({required String title, required List<double> values}) {
     List<CpuLoad> _createData() {
       final List<CpuLoad> data = [];
       for (int i = 0; i < values.length; i++) {
@@ -36,8 +36,12 @@ class _ScheduleViewState extends State<ScheduleView> {
         child: Center(
           child: SfCartesianChart(
             title: ChartTitle(text: title),
-            primaryXAxis: NumericAxis(interval: 1, majorGridLines: MajorGridLines(width: 0)),
-            primaryYAxis: NumericAxis(majorTickLines: MajorTickLines(color: Colors.transparent), axisLine: AxisLine(width: 0), minimum: 0, maximum: 100),
+            primaryXAxis: NumericAxis(interval: 1, majorGridLines: const MajorGridLines(width: 0)),
+            primaryYAxis: NumericAxis(
+                majorTickLines: const MajorTickLines(color: Colors.transparent),
+                axisLine: const AxisLine(width: 0),
+                minimum: 0,
+                maximum: 100),
             legend: Legend(isVisible: false),
             tooltipBehavior: TooltipBehavior(enable: true),
             series: <SplineAreaSeries<CpuLoad, int>>[
@@ -56,7 +60,9 @@ class _ScheduleViewState extends State<ScheduleView> {
   Widget _buildBody(Server server) {
     return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-        child: widget.scheduleType == ScheduleType.cpuTemps ? _bigItem(title: 'Температура CPU', values: server.cpuTemps) : _bigItem(title: 'Температура GPU', values: server.gpuTemps));
+        child: widget.scheduleType == ScheduleType.cpuTemps
+            ? _bigItem(title: 'Температура CPU', values: server.cpuTemps)
+            : _bigItem(title: 'Температура GPU', values: server.gpuTemps));
   }
 
   @override
@@ -70,9 +76,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     return Scaffold(
       appBar: AppBar(),
       body: Observer(
-        builder: (_) => _buildBody(
-          _serverState.servers[widget.serverName],
-        ),
+        builder: (_) => _buildBody(_serverState.servers[widget.serverName]!),
       ),
     );
   }

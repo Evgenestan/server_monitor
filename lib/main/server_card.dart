@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ServerCard extends StatelessWidget {
-  const ServerCard({Key key, @required this.title, @required this.isOnline, @required this.host, this.onPressed}) : super(key: key);
+  const ServerCard({Key? key, required this.title, required this.isOnline, required this.host, this.onPressed})
+      : super(key: key);
   final String title;
   final String host;
   final bool isOnline;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  Widget _buildTextWithParameter({@required String text, @required String parameter, Icon icon}) {
+  Widget _buildTextWithParameter({required String text, required String parameter, Icon? icon}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

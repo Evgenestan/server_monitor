@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CustomDialog extends StatelessWidget {
-  const CustomDialog({Key key, @required this.title, @required this.actions, this.description}) : super(key: key);
+  const CustomDialog({Key? key, required this.title, required this.actions, this.description = ''}) : super(key: key);
   final String title;
   final String description;
   final List<Widget> actions;
@@ -15,12 +15,12 @@ class CustomDialog extends StatelessWidget {
     return kIsWeb || Platform.isAndroid
         ? AlertDialog(
             title: Text(title),
-            content: description == null ? null : Text(description),
+            content: Text(description),
             actions: actions,
           )
         : CupertinoAlertDialog(
             title: Text(title),
-            content: description == null ? null : Text(description),
+            content: Text(description),
             actions: actions,
           );
   }

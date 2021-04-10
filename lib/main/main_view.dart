@@ -17,14 +17,15 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  ServerState _serverState;
+  late final ServerState _serverState;
 
   void _addServer() {
     Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerEditView()));
   }
 
   void _openServer(Server server) {
-    Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
+    Navigator.push<dynamic>(
+        context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
   }
 
   void deleteServer(Server server) {
@@ -40,23 +41,23 @@ class _MainViewState extends State<MainView> {
         description: 'Все связанные с ним сервера будут удалены',
         actions: [
           FlatButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
             child: const Text(
               'Отмена',
               style: TextStyle(color: Colors.black),
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
           FlatButton(
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Colors.red),
-            ),
             onPressed: () {
               deleteServer(server);
               Navigator.of(context).pop();
             },
+            child: const Text(
+              'Удалить',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -68,6 +69,7 @@ class _MainViewState extends State<MainView> {
     return Container(
       color: Colors.red,
       child: Align(
+        alignment: Alignment.centerRight,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: const <Widget>[
@@ -88,21 +90,20 @@ class _MainViewState extends State<MainView> {
             ),
           ],
         ),
-        alignment: Alignment.centerRight,
       ),
     );
   }
 
   Widget _buildServerCard(BuildContext context, int index) {
     final String key = _serverState.servers.keys.toList()[index];
-    final Server server = _serverState.servers[key];
+    final Server server = _serverState.servers[key]!;
     return Dismissible(
       confirmDismiss: (_) => remove(server),
       background: slideLeftBackground(),
       direction: DismissDirection.endToStart,
       key: Key('dismissible $index'),
       child: ServerCard(
-        title: server?.name ?? 'Имя сервера не найдено',
+        title: server.name,
         isOnline: DateTime.now().toUtc().difference(server.createTimes.last) < const Duration(seconds: 10),
         host: server.host,
         onPressed: () => _openServer(server),
@@ -125,6 +126,7 @@ class _MainViewState extends State<MainView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        onPressed: _addServer,
         child: Stack(
           children: [
             Center(
@@ -139,7 +141,6 @@ class _MainViewState extends State<MainView> {
             const Center(child: Icon(Icons.add)),
           ],
         ),
-        onPressed: _addServer,
       ),
       body: Observer(
         builder: (_) => ListView.builder(
