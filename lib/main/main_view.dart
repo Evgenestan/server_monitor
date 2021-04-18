@@ -23,17 +23,16 @@ class _MainViewState extends State<MainView> {
     Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerEditView()));
   }
 
-  void _openServer(Server server) {
-    Navigator.push<dynamic>(
-        context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
+  void _openServer(ServerDate server) {
+    Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ServerView(serverName: server.name)));
   }
 
-  void deleteServer(Server server) {
+  void deleteServer(ServerDate server) {
     final host = server.host;
     _serverState.deleteHost(host);
   }
 
-  Future<bool> remove(Server server) async {
+  Future<bool> remove(ServerDate server) async {
     await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => CustomDialog(
@@ -96,7 +95,7 @@ class _MainViewState extends State<MainView> {
 
   Widget _buildServerCard(BuildContext context, int index) {
     final String key = _serverState.servers.keys.toList()[index];
-    final Server server = _serverState.servers[key]!;
+    final ServerDate server = _serverState.servers[key]!.last;
     return Dismissible(
       confirmDismiss: (_) => remove(server),
       background: slideLeftBackground(),
@@ -104,7 +103,7 @@ class _MainViewState extends State<MainView> {
       key: Key('dismissible $index'),
       child: ServerCard(
         title: server.name,
-        isOnline: DateTime.now().toUtc().difference(server.createTimes.last) < const Duration(seconds: 10),
+        isOnline: DateTime.now().toUtc().difference(server.createTime) < const Duration(seconds: 10),
         host: server.host,
         onPressed: () => _openServer(server),
       ),
@@ -144,11 +143,14 @@ class _MainViewState extends State<MainView> {
         ),
       ),
       body: Observer(
-        builder: (_) => ListView.builder(
-          padding: const EdgeInsets.all(10),
-          itemBuilder: _buildServerCard,
-          itemCount: _serverState.count,
-        ),
+        builder: (_) {
+          print(_serverState.servers.length);
+          return ListView.builder(
+            padding: const EdgeInsets.all(10),
+            itemBuilder: _buildServerCard,
+            itemCount: _serverState.servers.length,
+          );
+        },
       ),
     );
   }

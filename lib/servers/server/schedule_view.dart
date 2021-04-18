@@ -20,7 +20,7 @@ class ScheduleView extends StatefulWidget {
 class _ScheduleViewState extends State<ScheduleView> {
   late final ServerState _serverState;
 
-  Widget _bigItem({required String title, required List<double> values}) {
+  Widget _bigItem({required String title, required List<int> values}) {
     List<CpuLoad> _createData() {
       final List<CpuLoad> data = [];
       for (int i = 0; i < values.length; i++) {
@@ -37,16 +37,13 @@ class _ScheduleViewState extends State<ScheduleView> {
           child: SfCartesianChart(
             title: ChartTitle(text: title),
             primaryXAxis: NumericAxis(interval: 1, majorGridLines: const MajorGridLines(width: 0)),
-            primaryYAxis: NumericAxis(
-                majorTickLines: const MajorTickLines(color: Colors.transparent),
-                axisLine: const AxisLine(width: 0),
-                minimum: 0,
-                maximum: 100),
+            primaryYAxis: NumericAxis(majorTickLines: const MajorTickLines(color: Colors.transparent), axisLine: const AxisLine(width: 0), minimum: 0, maximum: 100),
             legend: Legend(isVisible: false),
             tooltipBehavior: TooltipBehavior(enable: true),
-            series: <SplineAreaSeries<CpuLoad, int>>[
-              SplineAreaSeries<CpuLoad, int>(
+            series: <SplineSeries<CpuLoad, int>>[
+              SplineSeries<CpuLoad, int>(
                 dataSource: _createData(),
+                animationDuration: 0,
                 xValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.position,
                 yValueMapper: (CpuLoad cpuLoad, _) => cpuLoad.value,
               )
@@ -57,12 +54,12 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 
-  Widget _buildBody(Server server) {
+  Widget _buildBody(ServerDate server) {
     return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
         child: widget.scheduleType == ScheduleType.cpuTemps
-            ? _bigItem(title: 'Температура CPU', values: server.cpuTemps)
-            : _bigItem(title: 'Температура GPU', values: server.gpuTemps));
+            ? _bigItem(title: 'Температура CPU', values: _serverState.getServer(server.name).map((e) => e.cpuTemp).toList(growable: false))
+            : _bigItem(title: 'Температура GPU', values: _serverState.getServer(server.name).map((e) => e.gpuTemp).toList(growable: false)));
   }
 
   @override
@@ -76,7 +73,7 @@ class _ScheduleViewState extends State<ScheduleView> {
     return Scaffold(
       appBar: AppBar(),
       body: Observer(
-        builder: (_) => _buildBody(_serverState.servers[widget.serverName]!),
+        builder: (_) => _buildBody(_serverState.servers[widget.serverName]!.last),
       ),
     );
   }
@@ -84,6 +81,6 @@ class _ScheduleViewState extends State<ScheduleView> {
 
 class CpuLoad {
   CpuLoad(this.value, this.position);
-  final double value;
+  final int value;
   final int position;
 }

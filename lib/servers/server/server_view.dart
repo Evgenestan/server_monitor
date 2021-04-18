@@ -21,10 +21,7 @@ class _ServerViewState extends State<ServerView> {
   Widget _item({required String title, required String value, ScheduleType? scheduleType}) {
     void _openScheduleOfValues() {
       if (scheduleType != null) {
-        Navigator.push<dynamic>(
-            context,
-            MaterialPageRoute<dynamic>(
-                builder: (context) => ScheduleView(serverName: widget.serverName, scheduleType: scheduleType)));
+        Navigator.push<dynamic>(context, MaterialPageRoute<dynamic>(builder: (context) => ScheduleView(serverName: widget.serverName, scheduleType: scheduleType)));
       }
     }
 
@@ -58,7 +55,7 @@ class _ServerViewState extends State<ServerView> {
     );
   }
 
-  Widget _bigItem({required String title, required List<double> values}) {
+  Widget _bigItem({required String title, required List<int> values}) {
     List<Value> _createData() {
       final List<Value> data = [];
       for (int i = 0; i < values.length; i++) {
@@ -75,15 +72,12 @@ class _ServerViewState extends State<ServerView> {
           child: SfCartesianChart(
             title: ChartTitle(text: title),
             primaryXAxis: NumericAxis(interval: 1, majorGridLines: const MajorGridLines(width: 0)),
-            primaryYAxis: NumericAxis(
-                majorTickLines: const MajorTickLines(color: Colors.transparent),
-                axisLine: const AxisLine(width: 0),
-                minimum: 0,
-                maximum: 100),
+            primaryYAxis: NumericAxis(majorTickLines: const MajorTickLines(color: Colors.transparent), axisLine: const AxisLine(width: 0), minimum: 0, maximum: 100),
             legend: Legend(isVisible: false),
             tooltipBehavior: TooltipBehavior(enable: true),
             series: <SplineAreaSeries<Value, int>>[
               SplineAreaSeries<Value, int>(
+                animationDuration: 0,
                 dataSource: _createData(),
                 xValueMapper: (Value cpuLoad, _) => cpuLoad.position,
                 yValueMapper: (Value cpuLoad, _) => cpuLoad.value,
@@ -95,7 +89,7 @@ class _ServerViewState extends State<ServerView> {
     );
   }
 
-  Widget _buildBody(Server server) {
+  Widget _buildBody(ServerDate server) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
       children: [
@@ -106,7 +100,7 @@ class _ServerViewState extends State<ServerView> {
             _item(title: 'Скорость вращения вентилятора системы охлаждения CPU', value: server.cpuFan.toString()),
           ],
         ),
-        _bigItem(title: 'Загруженность CPU', values: server.cpuLoads),
+        _bigItem(title: 'Загруженность CPU', values: _serverState.getServer(server.name).map((e) => e.cpuLoad).toList(growable: false)),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -114,7 +108,7 @@ class _ServerViewState extends State<ServerView> {
             _item(title: 'Скорость вращения вентилятора системы охлаждения GPU', value: server.gpuFan.toString()),
           ],
         ),
-        _bigItem(title: 'Загруженность GPU', values: server.gpuLoads),
+        _bigItem(title: 'Загруженность GPU', values: _serverState.getServer(server.name).map((e) => e.gpuLoad).toList(growable: false)),
       ],
     );
   }
@@ -130,9 +124,11 @@ class _ServerViewState extends State<ServerView> {
     return Scaffold(
       appBar: AppBar(),
       body: Observer(
-        builder: (_) => _buildBody(
-          _serverState.servers[widget.serverName]!,
-        ),
+        builder: (_) {
+          return _buildBody(
+            _serverState.servers[widget.serverName]!.last,
+          );
+        },
       ),
     );
   }
@@ -140,6 +136,6 @@ class _ServerViewState extends State<ServerView> {
 
 class Value {
   Value(this.value, this.position);
-  final double value;
+  final int value;
   final int position;
 }

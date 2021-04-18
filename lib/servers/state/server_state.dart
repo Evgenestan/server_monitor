@@ -16,7 +16,9 @@ abstract class _ServerStateBase with Store {
   int count = 0;
 
   @observable
-  ObservableMap<String, Server> servers = ObservableMap();
+  ObservableMap<String, ObservableList<ServerDate>> servers = ObservableMap();
+
+  List<ServerDate> getServer(String name) => servers[name] ?? [];
 
   late final SharedPreferences _sharedPreferences;
 
@@ -37,18 +39,19 @@ abstract class _ServerStateBase with Store {
 
   @action
   Future<void> getData() async {
-    final Map<String, Server> _servers = await _serverClient.getData(endpoints);
-    servers.clear();
-    servers.addAll(_servers);
-    count = servers.length;
+    //final Map<String, Server> _servers = await _serverClient.getData(endpoints);
+    //servers.clear();
+    //servers.addAll(_servers);
+    //count = servers.length;
   }
 
   @action
-  void sync(Server server) {
-    servers.clear();
-    servers.addAll(
-      {server.name: server},
-    );
+  void sync(ServerDate server) {
+    servers[server.name] ??= ObservableList();
+    servers[server.name]?.add(server);
+    if (servers[server.name]?.length == 100) {
+      servers[server.name]?.removeAt(0);
+    }
   }
 
   void connectToSocket() {
