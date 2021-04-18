@@ -115,6 +115,7 @@ class _MainViewState extends State<MainView> {
   void initState() {
     super.initState();
     _serverState = Provider.of<ServerState>(context, listen: false);
+    _serverState.connectToSocket();
   }
 
   @override

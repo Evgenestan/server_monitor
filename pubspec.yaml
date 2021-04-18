@@ -23,6 +23,7 @@ dependencies:
   build_runner: ^1.12.2
 
   cupertino_icons: ^1.0.0
+  web_socket_channel: ^2.0.0
 
 dev_dependencies:
   flutter_test:

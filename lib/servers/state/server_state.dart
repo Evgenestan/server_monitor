@@ -43,6 +43,18 @@ abstract class _ServerStateBase with Store {
     count = servers.length;
   }
 
+  @action
+  void sync(Server server) {
+    servers.clear();
+    servers.addAll(
+      {server.name: server},
+    );
+  }
+
+  void connectToSocket() {
+    _serverClient.connectToSocket(sync);
+  }
+
   Future<void> init() async {
     _sharedPreferences = await SharedPreferences.getInstance();
   }
